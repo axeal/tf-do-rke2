@@ -1,0 +1,7 @@
+%{ for index, ip in servers ~}
+Host ${prefix}-server-${index}
+  HostName ${ip}
+  User ${user}
+  StrictHostKeyChecking no
+
+%{ endfor ~}

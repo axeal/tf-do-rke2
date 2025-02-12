@@ -1,0 +1,39 @@
+# DigitalOcean API token
+do_token = "your_token"
+
+# Admin password to access Rancher
+admin_password = "administrator"
+
+# Resources will be prefixed with this to avoid clashing names
+prefix = "myname-tf-do-rke2"
+
+# RKE2 version
+# rke2_version = "v1.31.4+rke2r1"
+
+# Rancher version to install
+# rancher_version = "2.10.2"
+
+# Count of RKE2 server nodes
+count_server_nodes = "1"
+
+# Region where nodes should be created
+region = "lon1"
+
+# Droplet sizes
+server_size = "s-4vcpu-8gb"
+
+# Image of nodes
+image = "ubuntu-22-04-x64"
+
+# User for image
+user = "root"
+
+# Chart repository for the rancher chart, defaults to the rancher-stable repository
+rancher_chart_repo = "https://releases.rancher.com/server-charts/stable"
+
+# DigitalOcean ssh-keyid
+# ssh_keys = [ "your_key_id" ]
+# Retrieve using (max 200 keys in account): `curl -s -X GET -H "Content-Type: application/json" -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" "https://api.digitalocean.com/v2/account/keys?per_page=200"  | jq -r '.ssh_keys[] | select(.name=="YOUR_KEY_NAME") | .id'`
+# If you have more than 200 keys in your account, use: `doctl -t $DIGITALOCEAN_TOKEN compute ssh-key list | grep YOUR_KEY_NAME | awk '{ print $1 }'`
+# If this is not specified, you will get an email with the root password
+ssh_keys = []
