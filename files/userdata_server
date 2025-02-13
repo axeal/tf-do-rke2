@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x 
+set -x
 
 mkdir -p /etc/rancher/rke2/
 
@@ -15,13 +15,11 @@ tls-san:
 EOF
 
 if [ "${count}" -gt "0" ]; then
-   echo "server: https://${lb_ip}:9345" >> /etc/rancher/rke2/config.yaml
+  echo "server: https://${lb_ip}:9345" >> /etc/rancher/rke2/config.yaml
 fi
 
-if [ -z "${rke2_version}" ]; then
-   VERSION_STRING=""
-else
-    export INSTALL_RKE2_VERSION="${rke2_version}"
+if [ ! -z "${rke2_version}" ]; then
+  export INSTALL_RKE2_VERSION="${rke2_version}"
 fi
 
 curl -sfL https://get.rke2.io | sh -
@@ -31,23 +29,23 @@ systemctl start rke2-server
 
 if [ "${count}" -eq "0" ]; then
 
-    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-    helm repo add jetstack https://charts.jetstack.io
-    helm repo add rancher ${rancher_chart_repo}
-    helm repo update
+  helm repo add jetstack https://charts.jetstack.io
+  helm repo add rancher ${rancher_chart_repo}
+  helm repo update
 
-    # wait for the rke2-ingress-nginx-controller to be ready
-    while ! /var/lib/rancher/rke2/bin/kubectl -n kube-system rollout status ds/rke2-ingress-nginx-controller; do
-        sleep 5
-    done
+  # wait for the rke2-ingress-nginx-controller to be ready
+  while ! /var/lib/rancher/rke2/bin/kubectl -n kube-system rollout status ds/rke2-ingress-nginx-controller; do
+    sleep 5
+  done
 
-    helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
+  helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
 
-    # wait for the cert-manager-webhook to be ready
-    while ! /var/lib/rancher/rke2/bin/kubectl -n cert-manager rollout status deploy/cert-manager-webhook; do
-        sleep 5
-    done
+  # wait for the cert-manager-webhook to be ready
+  while ! /var/lib/rancher/rke2/bin/kubectl -n cert-manager rollout status deploy/cert-manager-webhook; do
+    sleep 5
+  done
 
-    helm install rancher rancher/rancher --namespace cattle-system --create-namespace --set hostname=${lb_ip}.nip.io --version ${rancher_version} --set bootstrapPassword=${admin_password}
+  helm install rancher rancher/rancher --namespace cattle-system --create-namespace --set hostname=${lb_ip}.nip.io --version ${rancher_version} --set bootstrapPassword=${admin_password}
 fi
