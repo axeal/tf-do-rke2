@@ -7,7 +7,11 @@ variable "prefix" {
 }
 
 variable "count_server_nodes" {
-  default = "3"
+  default = "1"
+}
+
+variable "count_agent_nodes" {
+  default = "0"
 }
 
 variable "region" {
@@ -16,6 +20,10 @@ variable "region" {
 
 variable "server_size" {
   default = "s-4vcpu-8gb"
+}
+
+variable "agent_size" {
+  default = "s-2vcpu-4gb"
 }
 
 variable "rke2_version" {

@@ -16,11 +16,17 @@ prefix = "myname-tf-do-rke2"
 # Count of RKE2 server nodes
 count_server_nodes = "1"
 
+# Count of RKE2 agent nodes
+count_agent_nodes = "0"
+
 # Region where nodes should be created
 region = "lon1"
 
-# Droplet sizes
+# Droplet size for server nodes
 server_size = "s-4vcpu-8gb"
+
+# Droplet size for agent nodes
+agent_size = "s-2vcpu-4gb"
 
 # Image of nodes
 image = "ubuntu-22-04-x64"

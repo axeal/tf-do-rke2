@@ -92,10 +92,30 @@ resource "digitalocean_droplet" "server-node" {
   ]
 }
 
+resource "digitalocean_droplet" "agent-node" {
+  depends_on = [time_sleep.wait_10_seconds_to_destroy_vpc]
+  count      = var.count_agent_nodes
+  image      = var.image
+  name       = "${var.prefix}-agent-${count.index}"
+  vpc_uuid   = digitalocean_vpc.droplets-network.id
+  region     = var.region
+  size       = var.agent_size
+  user_data = templatefile("files/userdata_agent", {
+    rke2_version = var.rke2_version
+    token        = random_string.cluster-token.result
+    lb_ip        = digitalocean_loadbalancer.rke2-server.ip
+  })
+  ssh_keys = var.ssh_keys
+  tags = [
+    join("", ["user:", replace(split("@", data.digitalocean_account.do-account.email)[0], ".", "-")])
+  ]
+}
+
 resource "local_file" "ssh_config" {
   content = templatefile("${path.module}/files/ssh_config_template", {
     prefix  = var.prefix
     servers = [for node in digitalocean_droplet.server-node : node.ipv4_address],
+    agents  = [for node in digitalocean_droplet.agent-node : node.ipv4_address],
     user    = var.user
   })
   filename = "${path.module}/ssh_config"

@@ -4,11 +4,13 @@
 
 This Terraform setup will:
 
-- Start `count_server_nodes` amount of droplets
+- Start `count_server_nodes` amount of RKE2 server node droplets
+- Start `count_agent_nodes` amount of RKE2 agent node droplets
 - Create a loadbalancer pointing at the droplets for ports 80, 443, 6443 and 9345
 - Install RKE2 on the first server node
-- Install RKE2 on the other server nodes and join them to the first server node via the loadbalancer
-- Install cert-manager
+- Install RKE2 on the other server nodes and join them to the cluster via the loadbalancer
+- Install RKE2 on the agent nodes and join them to the cluster via the loadbalancer
+- Install the cert-manager helm chart
 - Install the Rancher helm chart according to the version specified in `rancher_version` and the chart repository specified in `rancher_chart_repo` (default https://releases.rancher.com/server-charts/stable)
 
 ## Options
