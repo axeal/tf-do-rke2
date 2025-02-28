@@ -47,5 +47,5 @@ if [ "${count}" -eq "0" ]; then
     sleep 5
   done
 
-  helm install rancher rancher/rancher --namespace cattle-system --create-namespace --set hostname=${lb_ip}.nip.io --version ${rancher_version} --set bootstrapPassword=${admin_password}
+  helm install rancher rancher/rancher --namespace cattle-system --create-namespace --set hostname=${lb_ip}.nip.io --version ${rancher_version} --set bootstrapPassword="${admin_password}"
 fi
