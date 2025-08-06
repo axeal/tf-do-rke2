@@ -3,10 +3,15 @@ set -x
 
 mkdir -p /etc/rancher/rke2/
 
-echo "export KUBECONFIG=/etc/rancher/rke2/rke2.yaml" >> /etc/profile
-echo "alias kubectl=/var/lib/rancher/rke2/bin/kubectl" >> /etc/profile
+cat << 'EOF' > /etc/profile.d/rancher.sh
+export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+export CRI_CONFIG_FILE=/var/lib/rancher/rke2/agent/etc/crictl.yaml
+export CONTAINERD_ADDRESS=/run/k3s/containerd/containerd.sock
+PATH="$PATH:/var/lib/rancher/rke2/bin"
+EOF
 
 export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+export HOME=/root
 
 cat <<EOF > /etc/rancher/rke2/config.yaml
 token: "${token}"
@@ -31,8 +36,19 @@ if [ "${count}" -eq "0" ]; then
 
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
+  # If user defines rancher prime helm repository, and chart version exists within it, use the prime repository;
+  # otherwise fall back to rancher-latest repository
+  repo=rancher-latest/rancher
+  if [ -n "${rancher_chart_repo}" ]; then
+    helm repo add rancher-prime ${rancher_chart_repo}
+    helm repo update
+    if helm search repo rancher --version ${rancher_version} --fail-on-no-result; then
+      repo=rancher-prime/rancher
+    fi
+  fi
+
   helm repo add jetstack https://charts.jetstack.io
-  helm repo add rancher ${rancher_chart_repo}
+  helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
   helm repo update
 
   # wait for the rke2-ingress-nginx-controller to be ready
@@ -47,5 +63,5 @@ if [ "${count}" -eq "0" ]; then
     sleep 5
   done
 
-  helm install rancher rancher/rancher --namespace cattle-system --create-namespace --set hostname=${lb_ip}.nip.io --version ${rancher_version} --set bootstrapPassword="${admin_password}"
+  helm install rancher $repo --namespace cattle-system --create-namespace --set hostname=${lb_ip}.nip.io --version ${rancher_version} --set bootstrapPassword="${admin_password}"
 fi
