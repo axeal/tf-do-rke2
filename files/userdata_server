@@ -8,6 +8,9 @@ export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
 export CRI_CONFIG_FILE=/var/lib/rancher/rke2/agent/etc/crictl.yaml
 export CONTAINERD_ADDRESS=/run/k3s/containerd/containerd.sock
 PATH="$PATH:/var/lib/rancher/rke2/bin"
+source <(kubectl completion bash)
+alias k=kubectl
+complete -F __start_kubectl k
 EOF
 
 export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
