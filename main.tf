@@ -17,10 +17,11 @@ resource "time_sleep" "wait_20_seconds_to_destroy_vpc" {
 }
 
 resource "digitalocean_loadbalancer" "rke2-server" {
-  depends_on = [time_sleep.wait_20_seconds_to_destroy_vpc]
-  name       = "${var.prefix}-rke2-server"
-  vpc_uuid   = digitalocean_vpc.droplets-network.id
-  region     = var.region
+  depends_on            = [time_sleep.wait_20_seconds_to_destroy_vpc]
+  name                  = "${var.prefix}-rke2-server"
+  vpc_uuid              = digitalocean_vpc.droplets-network.id
+  region                = var.region
+  enable_proxy_protocol = true
 
   forwarding_rule {
     entry_port     = 6443
