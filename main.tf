@@ -125,3 +125,11 @@ resource "local_file" "ssh_config" {
 output "rancher-url" {
   value = ["https://${digitalocean_loadbalancer.rke2-server.ip}.nip.io"]
 }
+output "Rancher_server-nodes-address" {
+  description = "Rancher server nodes IP"
+  value       = length(digitalocean_droplet.server-node[*].ipv4_address) > 0 ? digitalocean_droplet.server-node[*].ipv4_address : null
+}
+output "Rancher_agent-nodes-address" {                                                                                                                                                             
+  description = "Rancher agent nodes IP"                                                                                                                                                           
+  value       = length(digitalocean_droplet.agent-node[*].ipv4_address) > 0 ? digitalocean_droplet.agent-node[*].ipv4_address : null
+}
