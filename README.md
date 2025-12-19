@@ -11,7 +11,7 @@ This Terraform setup will:
 - Install RKE2 on the other server nodes and join them to the cluster via the loadbalancer
 - Install RKE2 on the agent nodes and join them to the cluster via the loadbalancer
 - Install the cert-manager helm chart
-- Install the Rancher helm chart according to the version specified in `rancher_version` and the chart repository specified in `rancher_chart_repo` (default https://releases.rancher.com/server-charts/stable)
+- Install the Rancher helm chart according to the version specified in `rancher_version` using the helm repository specified in `rancher_chart_repo` if specified (or falling back to rancher-latest)
 
 ## Options
 

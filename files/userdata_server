@@ -1,8 +1,8 @@
 #!/bin/bash
 set -x
 
-mkdir -p /etc/rancher/rke2/
-
+# Create shell profile file with RKE2 environment variables,
+# kubectl bash completion and alias
 cat << 'EOF' > /etc/profile.d/rancher.sh
 export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
 export CRI_CONFIG_FILE=/var/lib/rancher/rke2/agent/etc/crictl.yaml
@@ -13,29 +13,37 @@ alias k=kubectl
 complete -F __start_kubectl k
 EOF
 
-export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
-export HOME=/root
-
+# Create RKE2 config file
+mkdir -p /etc/rancher/rke2/
 cat <<EOF > /etc/rancher/rke2/config.yaml
 token: "${token}"
 tls-san:
   - ${lb_ip}
 EOF
 
+# If this is not the first server node, add server URL with loadbalancer IP to config file
 if [ "${count}" -gt "0" ]; then
   echo "server: https://${lb_ip}:9345" >> /etc/rancher/rke2/config.yaml
 fi
 
+# Set RKE2 version if specified
 if [ ! -z "${rke2_version}" ]; then
   export INSTALL_RKE2_VERSION="${rke2_version}"
 fi
 
+# Install RKE2 server
 curl -sfL https://get.rke2.io | sh -
 
+# Enable and start RKE2 server service
 systemctl enable rke2-server
 systemctl start rke2-server
 
+# If this is the first server node, install Rancher
 if [ "${count}" -eq "0" ]; then
+
+  # Set environment variables for Helm and kubectl
+  export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+  export HOME=/root
 
   # Install Helm
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -65,6 +73,7 @@ if [ "${count}" -eq "0" ]; then
     sleep 5
   done
 
+  # Install cert-manager
   helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
 
   # wait for the cert-manager-webhook to be ready
@@ -72,5 +81,6 @@ if [ "${count}" -eq "0" ]; then
     sleep 5
   done
 
+  # Install Rancher
   helm install rancher $repo --namespace cattle-system --create-namespace --set hostname=${lb_ip}.nip.io --version ${rancher_version} --set bootstrapPassword="${admin_password}"
 fi
