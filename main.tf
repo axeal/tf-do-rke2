@@ -21,7 +21,7 @@ resource "digitalocean_loadbalancer" "rke2-server" {
   name                  = "${var.prefix}-rke2-server"
   vpc_uuid              = digitalocean_vpc.droplets-network.id
   region                = var.region
-  enable_proxy_protocol = true
+  enable_proxy_protocol = false
 
   forwarding_rule {
     entry_port     = 6443
@@ -129,7 +129,7 @@ output "Rancher_server-nodes-address" {
   description = "Rancher server nodes IP"
   value       = length(digitalocean_droplet.server-node[*].ipv4_address) > 0 ? digitalocean_droplet.server-node[*].ipv4_address : null
 }
-output "Rancher_agent-nodes-address" {                                                                                                                                                             
-  description = "Rancher agent nodes IP"                                                                                                                                                           
+output "Rancher_agent-nodes-address" {
+  description = "Rancher agent nodes IP"
   value       = length(digitalocean_droplet.agent-node[*].ipv4_address) > 0 ? digitalocean_droplet.agent-node[*].ipv4_address : null
 }
