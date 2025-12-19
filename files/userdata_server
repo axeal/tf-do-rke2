@@ -46,7 +46,12 @@ if [ "${count}" -eq "0" ]; then
   if [ -n "${rancher_chart_repo}" ]; then
     helm repo add rancher-prime ${rancher_chart_repo}
     helm repo update
-    if helm search repo rancher --version ${rancher_version} --fail-on-no-result; then
+
+    # Check if the specified rancher version exists in the rancher-prime repository
+    # Rancher Prime >= 2.13.1 uses rancher-prime chart name, check for both possible names
+    if helm search repo rancher-prime/rancher-prime --version ${rancher_version} --fail-on-no-result; then
+      repo=rancher-prime/rancher-prime
+    elif helm search repo rancher-prime/rancher --version ${rancher_version} --fail-on-no-result; then
       repo=rancher-prime/rancher
     fi
   fi
